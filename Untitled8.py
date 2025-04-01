@@ -12,27 +12,23 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
-from webdriver_manager.chrome import ChromeDriverManager
 import time
 from bs4 import BeautifulSoup
 import pandas as pd
 import streamlit as st
 
 # Path to your ChromeDriver executable
-chrome_driver_path = './chromedriver'  # Change this to the actual path of chromedriver
+chrome_driver_path = 'chromedriver.exe'  # Change this to the actual path of chromedriver
 
 # Set up the Service object with the executable path
+service = Service(chrome_driver_path)
 
 # Set up Chrome options (optional, for headless mode, etc.)
 options = Options()
 options.add_argument('--headless')  # Uncomment if you want to run it in headless mode
-options.add_argument('--no-sandbox')
-options.add_argument('--disable-dev-shm-usage')
-
-options.binary_location = "/usr/bin/chromium-browser"
 
 # Set up the WebDriver with the Service and options
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+driver = webdriver.Chrome(service=service, options=options)
 wait = WebDriverWait(driver, 10)  # Initialize WebDriverWait here
 
 # CMS Login URL
@@ -139,7 +135,7 @@ def extract_all_courses():
 def save_to_csv(assignments):
     if assignments:
         df = pd.DataFrame(assignments)
-        df.to_csv('deadlines.txt', sep='\t', index=False)
+        df.to_csv('all_assignments.csv', index=False)
         print("Assignments saved to all_assignments.csv")
     else:
         print("No assignments found.")
@@ -150,7 +146,6 @@ def run():
     
     username = st.text_input("Enter Enrollment Number")
     password = st.text_input("Enter Password", type="password")
-    course_name = st.text_input("Enter Course Name")
     
     if st.button('Extract Assignments'):
         login_to_cms(username, password)
@@ -160,18 +155,6 @@ def run():
         save_to_csv(assignments)
         st.write(assignments)
         
-if __name__ == "__main__":
-    username = "02-136232-048"  # Your CMS enrollment number
-    password = "Ent@r564"  # Your CMS password
-
-    login_to_cms(username, password)
-    navigate_to_lms()
-    
-    assignments = extract_all_courses()
-    save_to_csv(assignments)
-    
-    driver.quit()
-
 if __name__ == "__main__":
     run()
 
