@@ -1,4 +1,5 @@
 streamlit
 selenium
-pyppeteer
-webdriver-manager
+chromedriver-autoinstaller
+beautifulsoup4
+pandas
