@@ -20,7 +20,7 @@ import streamlit as st
 chromedriver_autoinstaller.install()
 # Path to your ChromeDriver executable
 chrome_options = './chromedriver'
-chrome_options.binary_location = "./chrome"  # Path to the downloaded 'chrome.exe'
+chrome_options.binary_location = "/usr/bin/chromium-browser"  # Path to the downloaded 'chrome.exe'
 
 # Specify the path to chromedriver
 # Set up the Service object with the executable path
