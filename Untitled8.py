@@ -20,15 +20,17 @@ import streamlit as st
 # Automatically install chromedriver if not already installed
 chromedriver_autoinstaller.install()
 
-# Set paths to your chromium and chromedriver from repository
-chromedriver_path = os.path.join(os.getcwd(), 'chromedriver')  # Path to your chromedriver file in repo
-chrome_binary_path = os.path.join(os.getcwd(), 'chrome')     # Path to your chromium binary in repo
-
 # Set up Chrome options for headless browsing
 options = Options()
-options.add_argument('--headless')  # Uncomment if you want to run it in headless mode
+options.add_argument('--headless')  # Run in headless mode (no UI)
 options.add_argument('--disable-gpu')  # Disable GPU (to avoid some errors)
-options.add_argument('--no-sandbox')  # Necessary for Streamlit environment
+options.add_argument('--no-sandbox')  # Necessary for Heroku
+options.add_argument('--remote-debugging-port=9222')  # Debugging in headless mode
+
+# If running on Heroku, we need to set the appropriate paths for chromedriver and Chrome binary.
+chrome_binary_path = "/usr/bin/google-chrome-stable"  # Path in Heroku for Chrome binary
+chromedriver_path = "/usr/local/bin/chromedriver"  # Path in Heroku for chromedriver
+
 options.binary_location = chrome_binary_path  # Point to the correct binary (chromium)
 
 # Set up the Service with the correct path to chromedriver
