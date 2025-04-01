@@ -1,3 +1,4 @@
 streamlit
 selenium
-beautifulsoup4
+pyppeteer
+webdriver-manager
