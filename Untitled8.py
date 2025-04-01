@@ -3,7 +3,7 @@
 
 # In[33]:
 
-
+import os
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -17,24 +17,24 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import streamlit as st
 
+# Automatically install chromedriver if not already installed
 chromedriver_autoinstaller.install()
-# Path to your ChromeDriver executable
-chrome_options = './chromedriver'
-chrome_options.binary_location = "/usr/bin/chromium-browser"  # Path to the downloaded 'chrome.exe'
 
-# Specify the path to chromedriver
-# Set up the Service object with the executable path
-service = Service(chrome_options)
+# Set paths to your chromium and chromedriver from repository
+chromedriver_path = os.path.join(os.getcwd(), 'chromedriver')  # Path to your chromedriver file in repo
+chrome_binary_path = os.path.join(os.getcwd(), 'chromium')     # Path to your chromium binary in repo
 
-# Set up Chrome options (optional, for headless mode, etc.)
+# Set up Chrome options for headless browsing
 options = Options()
-
 options.add_argument('--headless')  # Uncomment if you want to run it in headless mode
 options.add_argument('--disable-gpu')  # Disable GPU (to avoid some errors)
 options.add_argument('--no-sandbox')  # Necessary for Streamlit environment
-options.binary_location = chromium_path
+options.binary_location = chrome_binary_path  # Point to the correct binary (chromium)
 
-# Set up the WebDriver with the Service and options
+# Set up the Service with the correct path to chromedriver
+service = Service(chromedriver_path)
+
+# Initialize WebDriver with the Service and options
 driver = webdriver.Chrome(service=service, options=options)
 wait = WebDriverWait(driver, 10)  # Initialize WebDriverWait here
 
