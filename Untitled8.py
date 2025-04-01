@@ -24,14 +24,15 @@ chrome_options.binary_location = "./chrome"  # Path to the downloaded 'chrome.ex
 
 # Specify the path to chromedriver
 # Set up the Service object with the executable path
-service = Service(chromedriver_autoinstaller.install())
+service = Service(chrome_options)
 
 # Set up Chrome options (optional, for headless mode, etc.)
 options = Options()
-options.binary_location = chromium_path
+
 options.add_argument('--headless')  # Uncomment if you want to run it in headless mode
-chrome_options.add_argument('--disable-gpu')  # Disable GPU (to avoid some errors)
-chrome_options.add_argument('--no-sandbox')  # Necessary for Streamlit environment
+options.add_argument('--disable-gpu')  # Disable GPU (to avoid some errors)
+options.add_argument('--no-sandbox')  # Necessary for Streamlit environment
+options.binary_location = chromium_path
 
 # Set up the WebDriver with the Service and options
 driver = webdriver.Chrome(service=service, options=options)
