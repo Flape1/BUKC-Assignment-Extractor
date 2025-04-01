@@ -17,18 +17,21 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import streamlit as st
 
+chromedriver_autoinstaller.install()
 # Path to your ChromeDriver executable
 chrome_driver_path = './chromedriver.exe'  # Change this to the actual path of chromedriver
 
 # Set up the Service object with the executable path
-service = Service(chrome_driver_path)
+service = Service(chromedriver_autoinstaller.install())
 
 # Set up Chrome options (optional, for headless mode, etc.)
 options = Options()
 options.add_argument('--headless')  # Uncomment if you want to run it in headless mode
+chrome_options.add_argument('--disable-gpu')  # Disable GPU (to avoid some errors)
+chrome_options.add_argument('--no-sandbox')  # Necessary for Streamlit environment
 
 # Set up the WebDriver with the Service and options
-driver = webdriver.Chrome(service=service, options=options)
+driver = webdriver.Chrome(service=service, options=chrome_options)
 wait = WebDriverWait(driver, 10)  # Initialize WebDriverWait here
 
 # CMS Login URL
