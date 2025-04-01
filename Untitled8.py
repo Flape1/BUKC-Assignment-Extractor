@@ -18,7 +18,7 @@ import pandas as pd
 import streamlit as st
 
 # Path to your ChromeDriver executable
-chrome_driver_path = './chrome'  # Change this to the actual path of chromedriver
+chrome_driver_path = './chromedriver.exe'  # Change this to the actual path of chromedriver
 
 # Set up the Service object with the executable path
 service = Service(chrome_driver_path)
