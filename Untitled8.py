@@ -12,23 +12,27 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
+from webdriver_manager.chrome import ChromeDriverManager
 import time
 from bs4 import BeautifulSoup
 import pandas as pd
 import streamlit as st
 
 # Path to your ChromeDriver executable
-chrome_driver_path = 'chromedriver.exe'  # Change this to the actual path of chromedriver
+chrome_driver_path = './chromedriver'  # Change this to the actual path of chromedriver
 
 # Set up the Service object with the executable path
-service = Service(chrome_driver_path)
 
 # Set up Chrome options (optional, for headless mode, etc.)
 options = Options()
 options.add_argument('--headless')  # Uncomment if you want to run it in headless mode
+options.add_argument('--no-sandbox')
+options.add_argument('--disable-dev-shm-usage')
+
+options.binary_location = "/usr/bin/chromium-browser"
 
 # Set up the WebDriver with the Service and options
-driver = webdriver.Chrome(service=service, options=options)
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 wait = WebDriverWait(driver, 10)  # Initialize WebDriverWait here
 
 # CMS Login URL
