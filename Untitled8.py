@@ -22,7 +22,7 @@ chromedriver_autoinstaller.install()
 
 # Set paths to your chromium and chromedriver from repository
 chromedriver_path = os.path.join(os.getcwd(), 'chromedriver')  # Path to your chromedriver file in repo
-chrome_binary_path = os.path.join(os.getcwd(), 'chromium')     # Path to your chromium binary in repo
+chrome_binary_path = os.path.join(os.getcwd(), 'chrome')     # Path to your chromium binary in repo
 
 # Set up Chrome options for headless browsing
 options = Options()
