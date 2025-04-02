@@ -204,8 +204,7 @@ def run():
                                 driver.quit()
                                 
                                 # Force page rerun to show assignments
-                                #st.experimental.rerun()
-                                st.legacy_caching.clear_cache()
+                                st.experimental_rerun()
                             else:
                                 st.error("Login failed. Please check your credentials.")
                         except Exception as e:
