@@ -4,7 +4,6 @@
 import streamlit as st
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -13,8 +12,6 @@ from selenium.common.exceptions import StaleElementReferenceException
 import time
 from bs4 import BeautifulSoup
 import pandas as pd
-import base64
-import io
 
 # Initialize session state variables
 if 'logged_in' not in st.session_state:
@@ -63,7 +60,7 @@ def login_to_cms(wait, driver, username, password):
     select_role = Select(role_dropdown)
     select_role.select_by_visible_text("Student")
 
-    driver.find_element(By.ID, "BodyPH_btnLogin").send_keys(Keys.RETURN)
+    driver.find_element(By.ID, "BodyPH_btnLogin").click()
     time.sleep(2)  # Wait for the login to complete
     return True
 
@@ -162,47 +159,161 @@ def extract_all_courses(wait, driver):
     
     return all_assignments
 
-def get_download_link(file_name, df):
-    """Generate a link to download the dataframe as a CSV file"""
-    csv = df.to_csv(index=False)
-    b64 = base64.b64encode(csv.encode()).decode()
-    href = f'<a href="data:file/csv;base64,{b64}" download="{file_name}">Download CSV File</a>'
-    return href
-
 # Main program
 def run():
+    st.set_page_config(
+        page_title="BUKC Assignment Extractor",
+        page_icon="📚",
+        layout="wide"
+    )
+    
     st.title('Bahria University Assignment Extractor')
     
-    # Add security note
-    st.markdown("""
-    <div style='background-color: #f0f2f6; padding: 10px; border-radius: 5px; margin-bottom: 20px;'>
-        <p style='color: #262730;'>🔒 <strong>Security Note:</strong> This app does not store your password or any login credentials. All data is processed in real-time and is not saved anywhere.</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Add custom CSS for hover effects
+    # Add custom CSS for overall styling
     st.markdown("""
     <style>
-        /* Change hover color for buttons and interactive elements */
-        .stButton > button:hover {
-            background-color: #4CAF50 !important;
-            color: white !important;
+        /* Main container styling */
+        .main {
+            background-color: #f8f9fa;
         }
         
-        /* Change hover color for form elements */
+        /* Security note styling */
+        .security-note {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #2196f3;
+        }
+        
+        /* Button styling */
+        .stButton > button {
+            background-color: #2196f3;
+            color: white;
+            border-radius: 5px;
+            padding: 0.5rem 1rem;
+            border: none;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .stButton > button:hover {
+            background-color: #1976d2 !important;
+            color: white !important;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        /* Text input styling */
+        .stTextInput > div > div > input {
+            border-radius: 5px;
+            border: 1px solid #bdbdbd;
+            padding: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
         .stTextInput > div > div > input:hover,
         .stTextInput > div > div > input:focus {
-            border-color: #4CAF50 !important;
+            border-color: #2196f3 !important;
+            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+        }
+        
+        /* Form container styling */
+        .stForm {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        /* Assignment card styling */
+        .assignment-card {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .assignment-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        /* Download link styling */
+        .download-link {
+            color: #2196f3;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            background-color: #e3f2fd;
+            display: inline-block;
+            margin-top: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .download-link:hover {
+            background-color: #bbdefb;
+            text-decoration: none;
+        }
+
+        /* Dropdown styling */
+        .stSelectbox > div > div > div {
+            border-radius: 5px;
+            border: 1px solid #bdbdbd;
+            transition: all 0.3s ease;
+        }
+        
+        .stSelectbox > div > div > div:hover {
+            border-color: #2196f3 !important;
+            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+        }
+
+        /* Expander styling */
+        .streamlit-expanderHeader {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .streamlit-expanderHeader:hover {
+            background-color: #e3f2fd !important;
+        }
+
+        /* Progress bar styling */
+        .stProgress > div > div > div {
+            background-color: #2196f3;
         }
     </style>
     """, unsafe_allow_html=True)
     
-    # Login section
+    # Add security note with improved styling
+    st.markdown("""
+    <div class="security-note">
+        <p style='color: #0d47a1; margin: 0;'>
+            <span style='font-size: 1.2em;'>🔒</span> 
+            <strong>Security Note:</strong> This app does not store your password or any login credentials. 
+            All data is processed in real-time and is not saved anywhere.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Login section with improved styling
     if not st.session_state.logged_in:
         with st.form("login_form"):
             st.subheader("Login to CMS")
-            username = st.text_input("Enter Enrollment Number")
-            password = st.text_input("Enter Password", type="password")
+            st.markdown("""
+            <div style='margin-bottom: 1.5rem;'>
+                Please enter your CMS credentials to view your assignments.
+            </div>
+            """, unsafe_allow_html=True)
+            
+            username = st.text_input("Enter Enrollment Number", placeholder="e.g., 12345")
+            password = st.text_input("Enter Password", type="password", placeholder="Enter your password")
+            
             submit_button = st.form_submit_button("Login & Extract Assignments")
             
             if submit_button:
@@ -240,8 +351,8 @@ def run():
     
     # Display assignments if logged in
     else:
-        # Add logout button
-        if st.button("Logout"):
+        # Add logout button with improved styling
+        if st.button("Logout", key="logout_button"):
             st.session_state.logged_in = False
             st.session_state.assignments = []
             st.rerun()
@@ -250,31 +361,32 @@ def run():
             # Convert to DataFrame for easier handling
             df = pd.DataFrame(st.session_state.assignments)
             
-            # Download all as CSV
-           # st.markdown(get_download_link("all_assignments.csv", df), unsafe_allow_html=True)
-            
-            # Display assignments grouped by course
+            # Display assignments grouped by course with improved styling
             st.subheader("Your Assignments")
             
             # Group by course and display
             courses = df['Course'].unique()
             
             for course in courses:
-                with st.expander(f"📚 {course}"):
+                with st.expander(f"📚 {course}", expanded=True):
                     course_assignments = df[df['Course'] == course]
                     
                     for i, row in course_assignments.iterrows():
-                        col1, col2 = st.columns([3, 1])
-                        
-                        with col1:
-                            st.markdown(f"**Assignment:** {row['Assignment']}")
-                            st.markdown(f"**Deadline:** {row['Deadline']}")
-                        
-                        with col2:
-                            if pd.notna(row['Download Link']):
-                                st.markdown(f"[Download]({row['Download Link']})")
-                        
-                        st.markdown("---")
+                        st.markdown("""
+                        <div class="assignment-card">
+                            <div style='margin-bottom: 0.5rem;'>
+                                <strong style='color: #2196f3;'>Assignment:</strong> {assignment}
+                            </div>
+                            <div style='margin-bottom: 0.5rem;'>
+                                <strong style='color: #2196f3;'>Deadline:</strong> {deadline}
+                            </div>
+                            {download_link}
+                        </div>
+                        """.format(
+                            assignment=row['Assignment'],
+                            deadline=row['Deadline'],
+                            download_link=f'<a href="{row["Download Link"]}" class="download-link" target="_blank">Download Assignment</a>' if pd.notna(row['Download Link']) else ''
+                        ), unsafe_allow_html=True)
         else:
             st.info("No assignments found.")
 
