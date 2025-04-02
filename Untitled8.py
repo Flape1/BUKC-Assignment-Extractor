@@ -169,139 +169,25 @@ def run():
     
     st.title('Bahria University Assignment Extractor')
     
-    # Add custom CSS for overall styling
+    # Add security note
+    st.markdown("""
+    <div style='background-color: #f0f2f6; padding: 10px; border-radius: 5px; margin-bottom: 20px;'>
+        <p style='color: #262730;'>🔒 <strong>Security Note:</strong> This app does not store your password or any login credentials. All data is processed in real-time and is not saved anywhere.</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Add custom CSS for hover effects
     st.markdown("""
     <style>
-        /* Main container styling */
-        .main {
-            background-color: #f8f9fa;
-        }
-        
-        /* Security note styling */
-        .security-note {
-            background-color: #e3f2fd;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 25px;
-            border-left: 4px solid #2196f3;
-        }
-        
-        /* Button styling */
-        .stButton > button {
-            background-color: #2196f3;
-            color: white;
-            border-radius: 5px;
-            padding: 0.5rem 1rem;
-            border: none;
-            transition: all 0.3s ease;
-            width: 100%;
-        }
-        
+        /* Change hover color for login button */
         .stButton > button:hover {
-            background-color: #1976d2 !important;
+            background-color: #4CAF50 !important;
             color: white !important;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-        
-        /* Text input styling */
-        .stTextInput > div > div > input {
-            border-radius: 5px;
-            border: 1px solid #bdbdbd;
-            padding: 0.5rem;
-            transition: all 0.3s ease;
-        }
-        
-        .stTextInput > div > div > input:hover,
-        .stTextInput > div > div > input:focus {
-            border-color: #2196f3 !important;
-            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
-        }
-        
-        /* Form container styling */
-        .stForm {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        /* Assignment card styling */
-        .assignment-card {
-            background-color: white;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-        }
-        
-        .assignment-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-        
-        /* Download link styling */
-        .download-link {
-            color: #2196f3;
-            text-decoration: none;
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            background-color: #e3f2fd;
-            display: inline-block;
-            margin-top: 0.5rem;
-            transition: all 0.3s ease;
-        }
-        
-        .download-link:hover {
-            background-color: #bbdefb;
-            text-decoration: none;
-        }
-
-        /* Dropdown styling */
-        .stSelectbox > div > div > div {
-            border-radius: 5px;
-            border: 1px solid #bdbdbd;
-            transition: all 0.3s ease;
-        }
-        
-        .stSelectbox > div > div > div:hover {
-            border-color: #2196f3 !important;
-            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
-        }
-
-        /* Expander styling */
-        .streamlit-expanderHeader {
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            padding: 0.5rem;
-            margin-bottom: 0.5rem;
-            transition: all 0.3s ease;
-        }
-        
-        .streamlit-expanderHeader:hover {
-            background-color: #e3f2fd !important;
-        }
-
-        /* Progress bar styling */
-        .stProgress > div > div > div {
-            background-color: #2196f3;
         }
     </style>
     """, unsafe_allow_html=True)
     
-    # Add security note with improved styling
-    st.markdown("""
-    <div class="security-note">
-        <p style='color: #0d47a1; margin: 0;'>
-            <span style='font-size: 1.2em;'>🔒</span> 
-            <strong>Security Note:</strong> This app does not store your password or any login credentials. 
-            All data is processed in real-time and is not saved anywhere.
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Login section with improved styling
+    # Login section
     if not st.session_state.logged_in:
         with st.form("login_form"):
             st.subheader("Login to CMS")
