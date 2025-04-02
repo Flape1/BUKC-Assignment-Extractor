@@ -160,8 +160,14 @@ def save_to_csv(assignments):
             if pd.notna(row['Download Link']):
                 download_url = row['Download Link']
                 
-                # Use Streamlit's markdown to display a link as a button
-                st.markdown(f'<a href="{download_url}" target="_blank"><button class="btn">Download Assignment</button></a>', unsafe_allow_html=True)
+                # Use Streamlit's download_button for downloading directly
+                # Provide download button for each assignment
+                st.download_button(
+                    label="Download Assignment: " + row['Assignment'],
+                    data=download_url,
+                    file_name=row['Assignment'] + ".pdf",  # Assuming the file extension is .pdf (change if needed)
+                    mime='application/octet-stream',  # or the appropriate MIME type
+                )
             else:
                 st.write("No downloadable file available.")
 
