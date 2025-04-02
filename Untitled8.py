@@ -161,7 +161,6 @@ def run():
         
             assignments = extract_all_courses(wait, driver)
             save_to_csv(assignments)
-            st.write(assignments)
         driver.quit()
     
     except Exception as e:
