@@ -17,28 +17,22 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import streamlit as st
 
-# Automatically install chromedriver if not already installed
-chromedriver_autoinstaller.install()
-
-# Set up Chrome options for headless browsing
-options = Options()
-options.add_argument('--headless')  # Run in headless mode (no UI)
-options.add_argument('--disable-gpu')  # Disable GPU (to avoid some errors)
-options.add_argument('--no-sandbox')  # Necessary for Heroku
-options.add_argument('--remote-debugging-port=9222')  # Debugging in headless mode
-
-# If running on Heroku, we need to set the appropriate paths for chromedriver and Chrome binary.
-chrome_binary_path = "/usr/bin/google-chrome-stable"  # Path in Heroku for Chrome binary
-chromedriver_path = "/usr/local/bin/chromedriver"  # Path in Heroku for chromedriver
-
-options.binary_location = chrome_binary_path  # Point to the correct binary (chromium)
-
-# Set up the Service with the correct path to chromedriver
-service = Service(chromedriver_path)
-
-# Initialize WebDriver with the Service and options
-driver = webdriver.Chrome(service=service, options=options)
-wait = WebDriverWait(driver, 10)  # Initialize WebDriverWait here
+def create_webdriver():
+    # Configure Chrome options
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    
+    # For Streamlit Cloud deployment
+    chrome_options.add_argument("--disable-extensions")
+    chrome_options.add_argument("--disable-infobars")
+    
+    # Setup the webdriver - no need to specify service or binary location
+    driver = webdriver.Chrome(options=chrome_options)
+    
+    return driver
 
 # CMS Login URL
 cms_url = "https://cms.bahria.edu.pk/Logins/Student/Login.aspx"
@@ -152,6 +146,9 @@ def save_to_csv(assignments):
 # Main program
 def run():
     st.title('Assignment Extractor')
+    try:
+        driver = create_webdriver()
+        wait = WebDriverWait(driver, 10)
     
     username = st.text_input("Enter Enrollment Number")
     password = st.text_input("Enter Password", type="password")
@@ -163,6 +160,10 @@ def run():
         assignments = extract_all_courses()
         save_to_csv(assignments)
         st.write(assignments)
+    driver.quit()
+    
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
         
 if __name__ == "__main__":
     run()
