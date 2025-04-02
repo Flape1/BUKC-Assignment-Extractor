@@ -141,7 +141,7 @@ def save_to_csv(assignments):
         print("No assignments found.")
 
 # Main program
-pythonCopydef run():
+def run():
     st.title('Assignment Extractor')
     try:
         driver = create_webdriver()
