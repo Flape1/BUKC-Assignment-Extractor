@@ -88,8 +88,8 @@ def extract_assignments(driver):
             deadline = cells[7].text.strip()
             if cells[6].text.strip() == "Deadline Exceeded":
                 continue
-             # Extract the download link Extract the download link (Usually in the last cell of the row)
-            download_link_tag = cells[-1].find('a', class_='label label-info', href=True)
+             # Extract the download link from cell[3]
+            download_link_tag = cells[2].find('a', href=True)  # Assuming the download link is in cell[3]
             download_link = download_link_tag['href'] if download_link_tag else None
 
             assignments_data.append({
