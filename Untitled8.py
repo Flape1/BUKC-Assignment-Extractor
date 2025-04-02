@@ -36,7 +36,7 @@ cms_url = "https://cms.bahria.edu.pk/Logins/Student/Login.aspx"
 lms_url = "https://lms.bahria.edu.pk/Student/Assignments.php"
 
 # Step 1: Login to CMS
-def login_to_cms(driver, username, password):
+def login_to_cms(wait, driver, username, password):
     driver.get(cms_url)
     time.sleep(2)
     
@@ -151,7 +151,7 @@ def run():
         password = st.text_input("Enter Password", type="password")
         
         if st.button('Extract Assignments'):
-            login_to_cms(driver,username, password)
+            login_to_cms(wait, driver,username, password)
             navigate_to_lms(driver)
         
             assignments = extract_all_courses(wait, driver)
