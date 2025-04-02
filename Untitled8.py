@@ -36,7 +36,7 @@ cms_url = "https://cms.bahria.edu.pk/Logins/Student/Login.aspx"
 lms_url = "https://lms.bahria.edu.pk/Student/Assignments.php"
 
 # Step 1: Login to CMS
-def login_to_cms(username, password):
+def login_to_cms(driver, username, password):
     driver.get(cms_url)
     time.sleep(2)
     
@@ -62,7 +62,7 @@ def login_to_cms(username, password):
     time.sleep(5)  # Wait for the login to complete
     
 # Step 2: Navigate to LMS and open Assignments
-def navigate_to_lms():
+def navigate_to_lms(driver):
     driver.get("https://cms.bahria.edu.pk/Sys/Common/GoToLMS.aspx")
     time.sleep(3)  # Wait for LMS to load
 
@@ -91,7 +91,7 @@ def extract_assignments():
     return assignments_data
 
 # Step 4: Extract assignments for all courses
-def extract_all_courses():
+def extract_all_courses(driver):
     driver.get(lms_url)
     time.sleep(2)
 
@@ -151,10 +151,10 @@ def run():
         password = st.text_input("Enter Password", type="password")
         
         if st.button('Extract Assignments'):
-            login_to_cms(username, password)
-            navigate_to_lms()
+            login_to_cms(driver,username, password)
+            navigate_to_lms(driver)
         
-            assignments = extract_all_courses()
+            assignments = extract_all_courses(driver)
             save_to_csv(assignments)
             st.write(assignments)
         driver.quit()
