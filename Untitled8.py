@@ -191,19 +191,26 @@ def save_to_csv(assignments):
 # Main program
 def run():
     st.title('Assignment Extractor')
+    if 'assignments_extracted' not in st.session_state:
+            st.session_state.assignments_extracted = False
     try:
-        driver = create_webdriver()
-        wait = WebDriverWait(driver, 10)
+        if not st.session_state.assignments_extracted:
         
-        username = st.text_input("Enter Enrollment Number")
-        password = st.text_input("Enter Password", type="password")
-        
-        if st.button('Extract Assignments'):
-            login_to_cms(wait, driver,username, password)
-            navigate_to_lms(driver)
-        
-            assignments = extract_all_courses(wait, driver)
-            save_to_csv(assignments)
+            driver = create_webdriver()
+            wait = WebDriverWait(driver, 10)
+            
+            username = st.text_input("Enter Enrollment Number")
+            password = st.text_input("Enter Password", type="password")
+            
+            if st.button('Extract Assignments'):
+                login_to_cms(wait, driver,username, password)
+                navigate_to_lms(driver)
+            
+                assignments = extract_all_courses(wait, driver)
+                save_to_csv(assignments)
+            st.session_state.assignments_extracted = True
+        else:
+            st.write("Assignments have already been extracted.")
         driver.quit()
     
     except Exception as e:
