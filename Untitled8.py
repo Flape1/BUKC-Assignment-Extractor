@@ -194,10 +194,12 @@ def run():
     if 'assignments_extracted' not in st.session_state:
             st.session_state.assignments_extracted = False
     try:
+        driver = create_webdriver()
+        wait = WebDriverWait(driver, 10)
+    
         if not st.session_state.assignments_extracted:
         
-            driver = create_webdriver()
-            wait = WebDriverWait(driver, 10)
+            
             
             username = st.text_input("Enter Enrollment Number")
             password = st.text_input("Enter Password", type="password")
