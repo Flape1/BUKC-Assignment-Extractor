@@ -204,7 +204,7 @@ def run():
                                 driver.quit()
                                 
                                 # Force page rerun to show assignments
-                                st.experimental_rerun()
+                                st.rerun()
                             else:
                                 st.error("Login failed. Please check your credentials.")
                         except Exception as e:
@@ -220,7 +220,7 @@ def run():
         if st.button("Logout"):
             st.session_state.logged_in = False
             st.session_state.assignments = []
-            st.experimental_rerun()
+            st.rerun()
         
         if st.session_state.assignments:
             # Convert to DataFrame for easier handling
