@@ -3,19 +3,16 @@
 
 # In[33]:
 
-import os
+import streamlit as st
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
 import time
 from bs4 import BeautifulSoup
 import pandas as pd
-import streamlit as st
 
 def create_webdriver():
     # Configure Chrome options
