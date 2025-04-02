@@ -163,8 +163,7 @@ def extract_all_courses(wait, driver):
 def run():
     st.set_page_config(
         page_title="BUKC Assignment Extractor",
-        page_icon="📚",
-        layout="wide"
+        page_icon="📚"
     )
     
     st.title('Bahria University Assignment Extractor')
