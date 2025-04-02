@@ -228,7 +228,7 @@ def run():
             df = pd.DataFrame(st.session_state.assignments)
             
             # Download all as CSV
-            st.markdown(get_download_link("all_assignments.csv", df), unsafe_allow_html=True)
+           # st.markdown(get_download_link("all_assignments.csv", df), unsafe_allow_html=True)
             
             # Display assignments grouped by course
             st.subheader("Your Assignments")
