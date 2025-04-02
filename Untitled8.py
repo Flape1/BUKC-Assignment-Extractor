@@ -59,12 +59,12 @@ def login_to_cms(driver, username, password):
     select_role.select_by_visible_text("Student")
 
     driver.find_element(By.ID, "BodyPH_btnLogin").send_keys(Keys.RETURN)
-    time.sleep(5)  # Wait for the login to complete
+    time.sleep(2)  # Wait for the login to complete
     
 # Step 2: Navigate to LMS and open Assignments
 def navigate_to_lms(driver):
     driver.get("https://cms.bahria.edu.pk/Sys/Common/GoToLMS.aspx")
-    time.sleep(3)  # Wait for LMS to load
+    time.sleep(2)  # Wait for LMS to load
 
 # Step 3: Extract assignments for a given course
 def extract_assignments():
@@ -91,7 +91,7 @@ def extract_assignments():
     return assignments_data
 
 # Step 4: Extract assignments for all courses
-def extract_all_courses(driver):
+def extract_all_courses(wait, driver):
     driver.get(lms_url)
     time.sleep(2)
 
@@ -154,7 +154,7 @@ def run():
             login_to_cms(driver,username, password)
             navigate_to_lms(driver)
         
-            assignments = extract_all_courses(driver)
+            assignments = extract_all_courses(wait, driver)
             save_to_csv(assignments)
             st.write(assignments)
         driver.quit()
