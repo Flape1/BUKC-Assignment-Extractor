@@ -157,12 +157,8 @@ def save_to_csv(assignments):
             st.write(f"**Course:** {row['Course']}")
             st.write(f"**Assignment:** {row['Assignment']}")
             st.write(f"**Deadline:** {row['Deadline']}")
-            
-            # Generate download link button if link exists
-            if row['Download Link']:
-                download_url = row['Download Link']
-                # Displaying download button using Markdown
-                st.markdown(f'[Download Assignment](https://lms.bahria.edu.pk/{download_url})', unsafe_allow_html=True)
+            if st.button(f"Download {row['Assignment']}", key=f"download_{index}"):
+                    st.markdown(f'<a href="{download_url}" target="_blank">Click here to download</a>', unsafe_allow_html=True)
             else:
                 st.write("No downloadable file available.")
 
