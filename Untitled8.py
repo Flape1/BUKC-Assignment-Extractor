@@ -173,6 +173,30 @@ def get_download_link(file_name, df):
 def run():
     st.title('Bahria University Assignment Extractor')
     
+    # Add security note
+    st.markdown("""
+    <div style='background-color: #f0f2f6; padding: 10px; border-radius: 5px; margin-bottom: 20px;'>
+        <p style='color: #262730;'>🔒 <strong>Security Note:</strong> This app does not store your password or any login credentials. All data is processed in real-time and is not saved anywhere.</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Add custom CSS for hover effects
+    st.markdown("""
+    <style>
+        /* Change hover color for buttons and interactive elements */
+        .stButton > button:hover {
+            background-color: #4CAF50 !important;
+            color: white !important;
+        }
+        
+        /* Change hover color for form elements */
+        .stTextInput > div > div > input:hover,
+        .stTextInput > div > div > input:focus {
+            border-color: #4CAF50 !important;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+    
     # Login section
     if not st.session_state.logged_in:
         with st.form("login_form"):
