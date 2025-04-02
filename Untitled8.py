@@ -90,6 +90,7 @@ def extract_assignments(driver):
                 continue
             assignments_data.append({"Assignment": assignment_name, "Deadline": deadline})
 
+    
     return assignments_data
 
 # Step 4: Extract assignments for all courses
@@ -112,6 +113,7 @@ def extract_all_courses(wait, driver):
     # Iterate through all courses
     for course_name in options:
         print(f"Fetching assignments for: {course_name}")
+        st.write(f"Fetching assignments for: {course_name}")
 
         # Refresh dropdown each time to prevent stale element issues
         course_dropdown = wait.until(EC.presence_of_element_located((By.NAME, "courseName")))
@@ -137,6 +139,7 @@ def extract_all_courses(wait, driver):
 def save_to_csv(assignments):
     if assignments:
         df = pd.DataFrame(assignments)
+        st.dataframe(df[['Course', 'Assignment', 'Deadline']])
         df.to_csv('all_assignments.csv', index=False)
         print("Assignments saved to all_assignments.csv")
     else:
