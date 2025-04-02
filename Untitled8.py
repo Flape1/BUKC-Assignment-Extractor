@@ -157,8 +157,11 @@ def save_to_csv(assignments):
             st.write(f"**Course:** {row['Course']}")
             st.write(f"**Assignment:** {row['Assignment']}")
             st.write(f"**Deadline:** {row['Deadline']}")
-            if st.button(f"Download {row['Assignment']}", key=f"download_{index}"):
-                    st.markdown(f'<a href="{download_url}" target="_blank">Click here to download</a>', unsafe_allow_html=True)
+            if pd.notna(row['Download Link']):
+                download_url = row['Download Link']
+                
+                # Use Streamlit's markdown to display a link as a button
+                st.markdown(f'<a href="{download_url}" target="_blank"><button class="btn">Download Assignment</button></a>', unsafe_allow_html=True)
             else:
                 st.write("No downloadable file available.")
 
