@@ -141,23 +141,23 @@ def save_to_csv(assignments):
         print("No assignments found.")
 
 # Main program
-def run():
+pythonCopydef run():
     st.title('Assignment Extractor')
     try:
         driver = create_webdriver()
         wait = WebDriverWait(driver, 10)
-    
-    username = st.text_input("Enter Enrollment Number")
-    password = st.text_input("Enter Password", type="password")
-    
-    if st.button('Extract Assignments'):
-        login_to_cms(username, password)
-        navigate_to_lms()
-    
-        assignments = extract_all_courses()
-        save_to_csv(assignments)
-        st.write(assignments)
-    driver.quit()
+        
+        username = st.text_input("Enter Enrollment Number")
+        password = st.text_input("Enter Password", type="password")
+        
+        if st.button('Extract Assignments'):
+            login_to_cms(username, password)
+            navigate_to_lms()
+        
+            assignments = extract_all_courses()
+            save_to_csv(assignments)
+            st.write(assignments)
+        driver.quit()
     
     except Exception as e:
         st.error(f"An error occurred: {e}")
