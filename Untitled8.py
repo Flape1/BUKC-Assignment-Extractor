@@ -69,7 +69,7 @@ def navigate_to_lms(driver):
     time.sleep(2)  # Wait for LMS to load
 
 # Step 3: Extract assignments for a given course
-def extract_assignments():
+def extract_assignments(driver):
     assignments_data = []
 
     soup = BeautifulSoup(driver.page_source, 'html.parser')
@@ -122,7 +122,7 @@ def extract_all_courses(wait, driver):
             time.sleep(0.5)  # Give it some time to load the assignments page
 
             # Extract assignments
-            assignments = extract_assignments()
+            assignments = extract_assignments(driver)
             for assignment in assignments:
                 assignment["Course"] = course_name
                 all_assignments.append(assignment)
