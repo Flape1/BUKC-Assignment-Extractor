@@ -88,7 +88,16 @@ def extract_assignments(driver):
             deadline = cells[7].text.strip()
             if cells[6].text.strip() == "Deadline Exceeded":
                 continue
-            assignments_data.append({"Assignment": assignment_name, "Deadline": deadline})
+             # Extract the download link
+             Extract the download link (Usually in the last cell of the row)
+            download_link_tag = cells[-1].find('a', class_='label label-info', href=True)
+            download_link = download_link_tag['href'] if download_link_tag else None
+
+            assignments_data.append({
+                "Assignment": assignment_name,
+                "Deadline": deadline,
+                "Download Link": download_link
+            })
 
     
     return assignments_data
@@ -136,14 +145,44 @@ def extract_all_courses(wait, driver):
     return all_assignments
 
 # Step 5: Save assignments to a CSV
+# Step 5: Save assignments to a CSV and provide download option
+# Step 5: Save assignments to a CSV and provide download option
 def save_to_csv(assignments):
     if assignments:
         df = pd.DataFrame(assignments)
-        st.dataframe(df[['Course', 'Assignment', 'Deadline']])
-        df.to_csv('all_assignments.csv', index=False)
-        print("Assignments saved to all_assignments.csv")
+        
+        # Display assignments table in Streamlit
+        st.write("### Extracted Assignments")
+        
+        for index, row in df.iterrows():
+            st.write(f"**Course:** {row['Course']}")
+            st.write(f"**Assignment:** {row['Assignment']}")
+            st.write(f"**Deadline:** {row['Deadline']}")
+            
+            # Generate download link button if link exists
+            if row['Download Link']:
+                download_url = row['Download Link']
+                # Displaying download button using Markdown
+                st.markdown(f'[Download Assignment](https://lms.bahria.edu.pk/{download_url})', unsafe_allow_html=True)
+            else:
+                st.write("No downloadable file available.")
+
+            st.write("---")
+        
+        # Save the dataframe to a CSV file
+        csv_file = df.to_csv(index=False).encode('utf-8')
+        
+        # Provide download option for the CSV file
+        """st.download_button(
+            label="Download All Assignments as CSV",
+            data=csv_file,
+            file_name='all_assignments.csv',
+            mime='text/csv'
+        )"""
     else:
-        print("No assignments found.")
+        st.write("No assignments found.")
+
+
 
 # Main program
 def run():
