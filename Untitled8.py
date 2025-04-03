@@ -92,11 +92,21 @@ def extract_assignments(driver):
             
             # Extract the download link from cell[2]
             download_link_tag = cells[2].find('a', href=True)
-            download_link = download_link_tag['href'] if download_link_tag else None
-            
-            # If there's a download link, make it a full URL if it's relative
-            if download_link and not download_link.startswith('http'):
-                download_link = f"https://lms.bahria.edu.pk/Student/{download_link}"
+            if download_link_tag:
+                # Get the onclick attribute which contains the actual download URL
+                onclick_attr = download_link_tag.get('onclick', '')
+                # Extract the URL from the onclick attribute
+                if 'window.open' in onclick_attr:
+                    url_start = onclick_attr.find("'") + 1
+                    url_end = onclick_attr.find("'", url_start)
+                    download_link = onclick_attr[url_start:url_end]
+                    # Make it a full URL if it's relative
+                    if download_link and not download_link.startswith('http'):
+                        download_link = f"https://lms.bahria.edu.pk/Student/{download_link}"
+                else:
+                    download_link = None
+            else:
+                download_link = None
 
             assignments_data.append({
                 "Assignment": assignment_name,
@@ -183,6 +193,23 @@ def run():
             background-color: #4CAF50 !important;
             color: white !important;
         }
+        
+        /* Download button styling */
+        .download-button {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: #2196f3;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .download-button:hover {
+            background-color: #1976d2;
+            color: white;
+        }
     </style>
     """, unsafe_allow_html=True)
     
@@ -257,21 +284,17 @@ def run():
                     course_assignments = df[df['Course'] == course]
                     
                     for i, row in course_assignments.iterrows():
-                        st.markdown("""
-                        <div class="assignment-card">
+                        st.markdown(f"""
+                        <div style='margin-bottom: 1rem; padding: 1rem; background-color: white; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);'>
                             <div style='margin-bottom: 0.5rem;'>
-                                <strong style='color: #2196f3;'>Assignment:</strong> {assignment}
+                                <strong>Assignment:</strong> {row['Assignment']}
                             </div>
                             <div style='margin-bottom: 0.5rem;'>
-                                <strong style='color: #2196f3;'>Deadline:</strong> {deadline}
+                                <strong>Deadline:</strong> {row['Deadline']}
                             </div>
-                            {download_link}
+                            {f'<a href="{row["Download Link"]}" class="download-button" target="_blank">Download Assignment</a>' if pd.notna(row['Download Link']) else ''}
                         </div>
-                        """.format(
-                            assignment=row['Assignment'],
-                            deadline=row['Deadline'],
-                            download_link=f'<a href="{row["Download Link"]}" class="download-link" target="_blank">Download Assignment</a>' if pd.notna(row['Download Link']) else ''
-                        ), unsafe_allow_html=True)
+                        """, unsafe_allow_html=True)
         else:
             st.info("No assignments found.")
 
