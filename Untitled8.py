@@ -13,12 +13,15 @@ import time
 from bs4 import BeautifulSoup
 import pandas as pd
 import urllib.parse
+import base64
 
 # Initialize session state variables
 if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
 if 'assignments' not in st.session_state:
     st.session_state.assignments = []
+if 'driver' not in st.session_state:
+    st.session_state.driver = None
 
 def create_webdriver():
     # Configure Chrome options
@@ -69,6 +72,30 @@ def login_to_cms(wait, driver, username, password):
 def navigate_to_lms(driver):
     driver.get("https://cms.bahria.edu.pk/Sys/Common/GoToLMS.aspx")
     time.sleep(2)  # Wait for LMS to load
+
+# Function to download a file
+def download_file(driver, file_url):
+    driver.get(file_url)
+    time.sleep(3)  # Wait for the file to load
+    try:
+        # Get the HTML content after navigating to file URL
+        page_source = driver.page_source
+        # Check if it's a binary file or HTML page
+        if '<html' not in page_source[:100]:  # Likely a binary file download
+            return driver.page_source  # Return binary content
+        else:
+            # It's still an HTML page, look for download links
+            soup = BeautifulSoup(page_source, 'html.parser')
+            download_links = soup.find_all('a', href=True)
+            for link in download_links:
+                if 'download' in link.get('href').lower() or '.pdf' in link.get('href').lower() or '.doc' in link.get('href').lower():
+                    absolute_url = urllib.parse.urljoin(file_url, link.get('href'))
+                    driver.get(absolute_url)
+                    time.sleep(2)
+                    return driver.page_source
+    except Exception as e:
+        print(f"Error downloading file: {e}")
+    return None
 
 # Step 3: Extract assignments for a given course
 def extract_assignments(driver):
@@ -168,6 +195,39 @@ def extract_all_courses(wait, driver):
     
     return all_assignments
 
+def get_download_link_html(filename, file_content, button_text="Download Assignment"):
+    """Generate HTML for a download button"""
+    if file_content is None:
+        return ""
+    
+    b64 = base64.b64encode(file_content.encode()).decode()
+    download_link = f'<a href="data:application/octet-stream;base64,{b64}" download="{filename}" class="download-button">{button_text}</a>'
+    return download_link
+
+def download_assignment(url, driver):
+    """Download an assignment file using the WebDriver"""
+    try:
+        # Navigate to the assignment URL
+        driver.get(url)
+        time.sleep(2)  # Wait for page to load
+        
+        # Get the page source
+        content = driver.page_source
+        
+        # Get filename from URL
+        filename = url.split('/')[-1]
+        if '?' in filename:
+            filename = filename.split('?')[0]
+        
+        # If no extension or looks like a PHP file, add .pdf extension
+        if '.' not in filename or filename.endswith('.php'):
+            filename = f"assignment_{int(time.time())}.pdf"
+            
+        return filename, content
+    except Exception as e:
+        st.error(f"Error downloading file: {e}")
+        return None, None
+
 # Main program
 def run():
     # Set page config and custom theme
@@ -177,25 +237,22 @@ def run():
         layout="wide"
     )
     
-    # Custom theme
+    # Dark theme styling
     st.markdown("""
     <style>
         .stApp {
-            background-color: #f5f7fa;
-        }
-        
-        .main {
-            background-color: #f5f7fa;
+            background-color: #2c3e50;
+            color: #ecf0f1;
         }
         
         h1, h2, h3 {
-            color: #2c3e50;
+            color: #ecf0f1;
         }
         
         /* Improve expander styling */
         .streamlit-expanderHeader {
-            background-color: #3498db !important;
-            color: white !important;
+            background-color: #34495e !important;
+            color: #ecf0f1 !important;
             border-radius: 5px !important;
         }
         
@@ -216,27 +273,29 @@ def run():
         
         /* Security box styling */
         .security-box {
-            background-color: #eaf2f8;
+            background-color: #34495e;
             border-left: 4px solid #3498db;
             padding: 10px 15px;
             border-radius: 5px;
             margin-bottom: 20px;
+            color: #ecf0f1;
         }
         
         /* Assignment card styling */
         .assignment-card {
             margin-bottom: 1rem;
             padding: 1rem;
-            background-color: #ffffff;
+            background-color: #34495e;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
             border-left: 4px solid #3498db;
             transition: transform 0.2s ease;
+            color: #ecf0f1;
         }
         
         .assignment-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
         
         /* Download button styling */
@@ -250,6 +309,7 @@ def run():
             margin-top: 0.5rem;
             transition: all 0.3s ease;
             font-weight: bold;
+            cursor: pointer;
         }
         
         .download-button:hover {
@@ -264,10 +324,41 @@ def run():
             font-weight: bold;
         }
         
-        /* Course title styling */
-        .course-title {
-            color: #2c3e50;
-            font-weight: bold;
+        /* Custom success box */
+        .success-box {
+            padding: 10px 15px;
+            border-radius: 5px;
+            background-color: #27ae60;
+            color: white;
+            margin-bottom: 10px;
+        }
+        
+        /* Custom error box */
+        .error-box {
+            padding: 10px 15px;
+            border-radius: 5px;
+            background-color: #e74c3c;
+            color: white;
+            margin-bottom: 10px;
+        }
+        
+        /* Form background */
+        .stForm {
+            background-color: #34495e;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        /* Override some Streamlit defaults */
+        .css-1d391kg, .css-12oz5g7 {
+            background-color: #2c3e50;
+        }
+        
+        /* Input fields */
+        .stTextInput > div > div > input {
+            background-color: #34495e;
+            color: #ecf0f1;
+            border-color: #3498db;
         }
     </style>
     """, unsafe_allow_html=True)
@@ -286,7 +377,7 @@ def run():
         with st.form("login_form"):
             st.subheader("Login to CMS")
             st.markdown("""
-            <div style='margin-bottom: 1.5rem;'>
+            <div style='margin-bottom: 1.5rem; color: #ecf0f1;'>
                 Please enter your CMS credentials to view your assignments.
             </div>
             """, unsafe_allow_html=True)
@@ -317,14 +408,14 @@ def run():
                                 # Store assignments in session state
                                 st.session_state.assignments = assignments
                                 st.session_state.logged_in = True
-                                
-                                # Close the driver
-                                driver.quit()
+                                st.session_state.driver = driver
                                 
                                 # Force page rerun to show assignments
                                 st.rerun()
                             else:
                                 st.error("Login failed. Please check your credentials.")
+                                if 'driver' in locals():
+                                    driver.quit()
                         except Exception as e:
                             st.error(f"An error occurred: {e}")
                             if 'driver' in locals():
@@ -338,6 +429,9 @@ def run():
         col1, col2 = st.columns([1, 6])
         with col1:
             if st.button("Logout", key="logout_button"):
+                if st.session_state.driver:
+                    st.session_state.driver.quit()
+                st.session_state.driver = None
                 st.session_state.logged_in = False
                 st.session_state.assignments = []
                 st.rerun()
@@ -357,17 +451,81 @@ def run():
                     course_assignments = df[df['Course'] == course]
                     
                     for i, row in course_assignments.iterrows():
+                        download_url = row['Download Link'] if pd.notna(row['Download Link']) else None
+                        assignment_name = row['Assignment']
+                        
+                        # Create a unique key for each button
+                        button_key = f"download_button_{i}_{assignment_name.replace(' ', '_')}"
+                        
                         st.markdown(f"""
                         <div class="assignment-card">
                             <div style='margin-bottom: 0.5rem;'>
-                                <strong>Assignment:</strong> {row['Assignment']}
+                                <strong>Assignment:</strong> {assignment_name}
                             </div>
                             <div style='margin-bottom: 0.5rem;'>
                                 <strong>Deadline:</strong> <span class="deadline-text">{row['Deadline']}</span>
                             </div>
-                            {f'<a href="{row["Download Link"]}" class="download-button" target="_blank">📥 Download Assignment</a>' if pd.notna(row['Download Link']) else '<span style="color: #7f8c8d; font-style: italic;">No download available</span>'}
                         </div>
                         """, unsafe_allow_html=True)
+                        
+                        if download_url:
+                            if st.button(f"📥 Download {assignment_name}", key=button_key):
+                                with st.spinner(f"Downloading {assignment_name}..."):
+                                    try:
+                                        st.session_state.driver.get(download_url)
+                                        time.sleep(2)  # Wait for page to load
+                                        
+                                        # Try to find actual file download link
+                                        current_url = st.session_state.driver.current_url
+                                        page_source = st.session_state.driver.page_source
+                                        soup = BeautifulSoup(page_source, 'html.parser')
+                                        
+                                        # Look for common download elements
+                                        download_links = []
+                                        for a in soup.find_all('a', href=True):
+                                            href = a.get('href', '')
+                                            if ('download' in href.lower() or 
+                                                '.pdf' in href.lower() or 
+                                                '.doc' in href.lower() or 
+                                                '.zip' in href.lower()):
+                                                download_links.append(a)
+                                        
+                                        if download_links:
+                                            # Use the first download link
+                                            download_href = download_links[0].get('href')
+                                            if not download_href.startswith('http'):
+                                                download_href = urllib.parse.urljoin(current_url, download_href)
+                                            
+                                            # Create download link
+                                            filename = download_href.split('/')[-1]
+                                            if '?' in filename:
+                                                filename = filename.split('?')[0]
+                                            
+                                            st.markdown(f"""
+                                            <div class="success-box">
+                                                <p>✅ Ready to download: {filename}</p>
+                                                <a href="{download_href}" download="{filename}" class="download-button" target="_blank">
+                                                    Click here if download doesn't start automatically
+                                                </a>
+                                            </div>
+                                            <script>
+                                                window.open('{download_href}', '_blank');
+                                            </script>
+                                            """, unsafe_allow_html=True)
+                                        else:
+                                            # No specific download link found, use the current page
+                                            st.markdown(f"""
+                                            <div class="success-box">
+                                                <p>✅ Download page opened</p>
+                                                <a href="{current_url}" class="download-button" target="_blank">
+                                                    Click here to open download page in a new tab
+                                                </a>
+                                            </div>
+                                            """, unsafe_allow_html=True)
+                                    except Exception as e:
+                                        st.error(f"Error downloading assignment: {e}")
+                        else:
+                            st.info("No download available for this assignment.")
         else:
             st.info("No assignments found.")
 
