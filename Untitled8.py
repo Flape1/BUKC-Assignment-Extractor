@@ -97,7 +97,7 @@ def extract_assignments(driver):
                 download_link = download_link_tag.get('href', '')
                 if download_link:
                     # Add a query parameter to force download
-                    download_link = f"{download_link}?download=1"
+                    download_link = f"{download_link}"
             else:
                 download_link = None
 
