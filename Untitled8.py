@@ -317,7 +317,7 @@ def run():
     st.markdown("""
     <style>
         .stApp {
-            background-color: #1e1e1e;  /* Dark grey background */
+            background-color: #121212;  /* Darker grey background */
             color: #ecf0f1;
         }
         
@@ -327,7 +327,7 @@ def run():
         
         /* Improve expander styling */
         .streamlit-expanderHeader {
-            background-color: #2d2d2d !important;  /* Slightly lighter grey */
+            background-color: #1a1a1a !important;  /* Slightly lighter grey */
             color: #ecf0f1 !important;
             border-radius: 5px !important;
         }
@@ -349,7 +349,7 @@ def run():
         
         /* Security box styling */
         .security-box {
-            background-color: #2d2d2d;  /* Slightly lighter grey */
+            background-color: #1a1a1a;  /* Slightly lighter grey */
             border-left: 4px solid #3498db;
             padding: 10px 15px;
             border-radius: 5px;
@@ -361,7 +361,7 @@ def run():
         .assignment-card {
             margin-bottom: 1rem;
             padding: 1rem;
-            background-color: #2d2d2d;  /* Slightly lighter grey */
+            background-color: #1a1a1a;  /* Slightly lighter grey */
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
             border-left: 4px solid #3498db;
@@ -420,19 +420,19 @@ def run():
         
         /* Form background */
         .stForm {
-            background-color: #2d2d2d;  /* Slightly lighter grey */
+            background-color: #1a1a1a;  /* Slightly lighter grey */
             padding: 20px;
             border-radius: 10px;
         }
         
         /* Override some Streamlit defaults */
         .css-1d391kg, .css-12oz5g7 {
-            background-color: #1e1e1e;  /* Dark grey */
+            background-color: #121212;  /* Darker grey */
         }
         
         /* Input fields */
         .stTextInput > div > div > input {
-            background-color: #2d2d2d;  /* Slightly lighter grey */
+            background-color: #1a1a1a;  /* Slightly lighter grey */
             color: #ecf0f1;
             border-color: #3498db;
         }
