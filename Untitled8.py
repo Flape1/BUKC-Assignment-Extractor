@@ -278,7 +278,7 @@ def run():
                     
                     for i, row in course_assignments.iterrows():
                         st.markdown(f"""
-                        <div style='margin-bottom: 1rem; padding: 1rem; background-color: white; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);'>
+                        <div style='margin-bottom: 1rem; padding: 1rem; background-color: #f0f2f6; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);'>
                             <div style='margin-bottom: 0.5rem;'>
                                 <strong>Assignment:</strong> {row['Assignment']}
                             </div>
