@@ -93,18 +93,11 @@ def extract_assignments(driver):
             # Extract the download link from cell[2]
             download_link_tag = cells[2].find('a', href=True)
             if download_link_tag:
-                # Get the onclick attribute which contains the actual download URL
-                onclick_attr = download_link_tag.get('onclick', '')
-                # Extract the URL from the onclick attribute
-                if 'window.open' in onclick_attr:
-                    url_start = onclick_attr.find("'") + 1
-                    url_end = onclick_attr.find("'", url_start)
-                    download_link = onclick_attr[url_start:url_end]
-                    # Make it a full URL if it's relative
-                    if download_link and not download_link.startswith('http'):
-                        download_link = f"https://lms.bahria.edu.pk/Student/{download_link}"
-                else:
-                    download_link = None
+                # Get the direct href value
+                download_link = download_link_tag.get('href', '')
+                if download_link:
+                    # Add a query parameter to force download
+                    download_link = f"{download_link}?download=1"
             else:
                 download_link = None
 
