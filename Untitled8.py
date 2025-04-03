@@ -475,7 +475,6 @@ def run():
                                     st.session_state.logged_in = False
                                     st.session_state.assignments = []
                                     st.rerun()
-                                    return
                                     
                                 with st.spinner(f"Downloading {assignment_name}..."):
                                     try:
