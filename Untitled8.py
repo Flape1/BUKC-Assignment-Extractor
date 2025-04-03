@@ -309,8 +309,8 @@ def run():
     # Set page config and custom theme
     st.set_page_config(
         page_title="BUKC Assignment Extractor",
-        page_icon="📚",
-        layout="wide"
+        page_icon="��",
+        layout="centered"
     )
     
     # Dark theme styling with darker grey background
