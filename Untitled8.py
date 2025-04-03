@@ -12,6 +12,7 @@ from selenium.common.exceptions import StaleElementReferenceException
 import time
 from bs4 import BeautifulSoup
 import pandas as pd
+import urllib.parse
 
 # Initialize session state variables
 if 'logged_in' not in st.session_state:
@@ -93,11 +94,16 @@ def extract_assignments(driver):
             # Extract the download link from cell[2]
             download_link_tag = cells[2].find('a', href=True)
             if download_link_tag:
-                # Get the direct href value
+                # Get the absolute URL for download
                 download_link = download_link_tag.get('href', '')
                 if download_link:
-                    # Add a query parameter to force download
-                    download_link = f"{download_link}"
+                    # Make sure the link is absolute
+                    if not download_link.startswith('http'):
+                        # Create absolute URL
+                        base_url = "https://lms.bahria.edu.pk/Student/"
+                        download_link = urllib.parse.urljoin(base_url, download_link)
+                else:
+                    download_link = None
             else:
                 download_link = None
 
@@ -164,46 +170,115 @@ def extract_all_courses(wait, driver):
 
 # Main program
 def run():
+    # Set page config and custom theme
     st.set_page_config(
         page_title="BUKC Assignment Extractor",
-        page_icon="📚"
+        page_icon="📚",
+        layout="wide"
     )
     
-    st.title('Bahria University Assignment Extractor')
-    
-    # Add security note
-    st.markdown("""
-    <div style='background-color: #f0f2f6; padding: 10px; border-radius: 5px; margin-bottom: 20px;'>
-        <p style='color: #262730;'>🔒 <strong>Security Note:</strong> This app does not store your password or any login credentials. All data is processed in real-time and is not saved anywhere.</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Add custom CSS for hover effects
+    # Custom theme
     st.markdown("""
     <style>
-        /* Change hover color for login button */
-        .stButton > button:hover {
-            background-color: #4CAF50 !important;
+        .stApp {
+            background-color: #f5f7fa;
+        }
+        
+        .main {
+            background-color: #f5f7fa;
+        }
+        
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        
+        /* Improve expander styling */
+        .streamlit-expanderHeader {
+            background-color: #3498db !important;
             color: white !important;
+            border-radius: 5px !important;
+        }
+        
+        /* Change hover color for login button */
+        .stButton > button {
+            background-color: #3498db !important;
+            color: white !important;
+            border-radius: 5px !important;
+            border: none !important;
+            padding: 0.5rem 1rem !important;
+            font-weight: bold !important;
+        }
+        
+        .stButton > button:hover {
+            background-color: #2980b9 !important;
+            color: white !important;
+        }
+        
+        /* Security box styling */
+        .security-box {
+            background-color: #eaf2f8;
+            border-left: 4px solid #3498db;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        /* Assignment card styling */
+        .assignment-card {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            border-left: 4px solid #3498db;
+            transition: transform 0.2s ease;
+        }
+        
+        .assignment-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         
         /* Download button styling */
         .download-button {
             display: inline-block;
             padding: 0.5rem 1rem;
-            background-color: #2196f3;
-            color: white;
+            background-color: #2ecc71;
+            color: white !important;
             text-decoration: none;
             border-radius: 5px;
             margin-top: 0.5rem;
             transition: all 0.3s ease;
+            font-weight: bold;
         }
         
         .download-button:hover {
-            background-color: #1976d2;
-            color: white;
+            background-color: #27ae60;
+            color: white !important;
+            text-decoration: none;
+        }
+        
+        /* Deadline styling */
+        .deadline-text {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        /* Course title styling */
+        .course-title {
+            color: #2c3e50;
+            font-weight: bold;
         }
     </style>
+    """, unsafe_allow_html=True)
+    
+    st.title('Bahria University Assignment Extractor')
+    
+    # Add security note with improved styling
+    st.markdown("""
+    <div class="security-box">
+        <p>🔒 <strong>Security Note:</strong> This app does not store your password or any login credentials. All data is processed in real-time and is not saved anywhere.</p>
+    </div>
     """, unsafe_allow_html=True)
     
     # Login section
@@ -216,8 +291,11 @@ def run():
             </div>
             """, unsafe_allow_html=True)
             
-            username = st.text_input("Enter Enrollment Number", placeholder="e.g., 12345")
-            password = st.text_input("Enter Password", type="password", placeholder="Enter your password")
+            col1, col2 = st.columns(2)
+            with col1:
+                username = st.text_input("Enter Enrollment Number", placeholder="e.g., 12345")
+            with col2:
+                password = st.text_input("Enter Password", type="password", placeholder="Enter your password")
             
             submit_button = st.form_submit_button("Login & Extract Assignments")
             
@@ -257,10 +335,12 @@ def run():
     # Display assignments if logged in
     else:
         # Add logout button with improved styling
-        if st.button("Logout", key="logout_button"):
-            st.session_state.logged_in = False
-            st.session_state.assignments = []
-            st.rerun()
+        col1, col2 = st.columns([1, 6])
+        with col1:
+            if st.button("Logout", key="logout_button"):
+                st.session_state.logged_in = False
+                st.session_state.assignments = []
+                st.rerun()
         
         if st.session_state.assignments:
             # Convert to DataFrame for easier handling
@@ -278,14 +358,14 @@ def run():
                     
                     for i, row in course_assignments.iterrows():
                         st.markdown(f"""
-                        <div style='margin-bottom: 1rem; padding: 1rem; background-color: #f0f2f6; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);'>
+                        <div class="assignment-card">
                             <div style='margin-bottom: 0.5rem;'>
                                 <strong>Assignment:</strong> {row['Assignment']}
                             </div>
                             <div style='margin-bottom: 0.5rem;'>
-                                <strong>Deadline:</strong> {row['Deadline']}
+                                <strong>Deadline:</strong> <span class="deadline-text">{row['Deadline']}</span>
                             </div>
-                            {f'<a href="{row["Download Link"]}" class="download-button" target="_blank">Download Assignment</a>' if pd.notna(row['Download Link']) else ''}
+                            {f'<a href="{row["Download Link"]}" class="download-button" target="_blank">📥 Download Assignment</a>' if pd.notna(row['Download Link']) else '<span style="color: #7f8c8d; font-style: italic;">No download available</span>'}
                         </div>
                         """, unsafe_allow_html=True)
         else:
