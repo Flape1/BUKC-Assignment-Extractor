@@ -470,6 +470,13 @@ def run():
                         
                         if download_url:
                             if st.button(f"📥 Download {assignment_name}", key=button_key):
+                                if st.session_state.driver is None:
+                                    st.error("Session expired. Please log in again.")
+                                    st.session_state.logged_in = False
+                                    st.session_state.assignments = []
+                                    st.rerun()
+                                    return
+                                    
                                 with st.spinner(f"Downloading {assignment_name}..."):
                                     try:
                                         st.session_state.driver.get(download_url)
